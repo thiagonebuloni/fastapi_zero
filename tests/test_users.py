@@ -66,35 +66,23 @@ def test_delete_user(client, user, token):
     assert response.json() == {'message': 'User deleted'}
 
 
-def test_read_user(client, user):
+def test_read_user(client, other_user):
     response = client.get('/users/1')
 
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {
-        'username': 'Teste',
-        'email': 'teste@test.com',
+        'username': other_user.username,
+        'email': other_user.email,
         'id': 1,
     }
 
 
-def test_update_integrity_error(client, user, token):
-    # Inserindo fausto
-    client.post(
-        '/users',
-        headers={'Authorization': f'Bearer {token}'},
-        json={
-            'username': 'fausto',
-            'email': 'fausto@example.com',
-            'password': 'secret',
-        },
-    )
-
-    # Alterando o user das fixtures para fausto
+def test_update_integrity_error(client, user, other_user, token):
     response = client.put(
         f'/users/{user.id}',
         headers={'Authorization': f'Bearer {token}'},
         json={
-            'username': 'fausto',
+            'username': other_user.username,
             'email': 'bob@example.com',
             'password': 'mynewpassword',
         },
@@ -104,13 +92,13 @@ def test_update_integrity_error(client, user, token):
     assert response.json() == {'detail': 'Username or email already exists'}
 
 
-def test_create_user_username_conflict(client, user, token):
+def test_create_user_username_conflict(client, other_user, token):
     response = client.post(
         '/users/',
         headers={'Authorization': f'Bearer {token}'},
         json={
-            'username': 'Teste',
-            'email': 'teste@test.com',
+            'username': other_user.username,
+            'email': 'test@test.com',
             'password': 'secret',
         },
     )
@@ -118,15 +106,39 @@ def test_create_user_username_conflict(client, user, token):
     assert response.json() == {'detail': 'Username already exists'}
 
 
-def test_create_user_email_conflict(client, user, token):
+def test_create_user_email_conflict(client, other_user, token):
     response = client.post(
         '/users/',
         headers={'Authorization': f'Bearer {token}'},
         json={
             'username': 'Alice',
-            'email': 'teste@test.com',
-            'password': 'secret',
+            'email': other_user.email,
+            'password': other_user.password,
         },
     )
     assert response.status_code == HTTPStatus.CONFLICT
     assert response.json() == {'detail': 'Email already exists'}
+
+
+def test_update_user_with_wrong_user(client, other_user, token):
+    response = client.put(
+        f'/users/{other_user.id}',
+        headers={'Authorization': f'Bearer {token}'},
+        json={
+            'username': 'bob',
+            'email': 'bob@example.com',
+            'password': 'mynewpassword',
+        },
+    )
+
+    assert response.status_code == HTTPStatus.FORBIDDEN
+    assert response.json() == {'detail': 'Not enough permissions'}
+
+
+def test_delete_user_wrong_user(client, other_user, token):
+    response = client.delete(
+        f'/users/{other_user.id}',
+        headers={'Authorization': f'Bearer {token}'},
+    )
+    assert response.status_code == HTTPStatus.FORBIDDEN
+    assert response.json() == {'detail': 'Not enough permissions'}

@@ -1,7 +1,10 @@
 from http import HTTPStatus
 
+import pytest
 
-def test_root_deve_retornar_ola_mundo(client):
+
+@pytest.mark.asyncio
+async def test_root_deve_retornar_ola_mundo(client):
     """
     Esse teste tem 3 etapas (AAA) triple A
     - A: Arrange
@@ -14,7 +17,8 @@ def test_root_deve_retornar_ola_mundo(client):
     assert response.status_code == HTTPStatus.OK
 
 
-def test_ola_mundo_deve_retornar_ola_mundo(client):
+@pytest.mark.asyncio
+async def test_ola_mundo_deve_retornar_ola_mundo(client):
     response = client.get('/ola_mundo/')
 
     assert response.status_code == HTTPStatus.OK

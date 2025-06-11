@@ -19,7 +19,7 @@ def read_root():
 
 
 @app.get('/ola_mundo/', status_code=HTTPStatus.OK)
-def ola_mundo():
+async def ola_mundo():
     html = """
         <html><head>Olá mundo!</head><body><h1>Olá mundo!</h1></body></html>
     """
