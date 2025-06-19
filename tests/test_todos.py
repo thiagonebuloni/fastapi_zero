@@ -1,11 +1,13 @@
 from http import HTTPStatus
 
+import factory
 import factory.fuzzy
 import pytest
-from factory import Factory, Faker
+from factory.base import Factory
+from factory.faker import Faker
 from sqlalchemy import select
 
-from fastapi_zero.models import Todo, TodoState
+from fastapi_zero.models import Todo, TodoState, User
 
 
 class TodoFactory(Factory):
@@ -15,6 +17,7 @@ class TodoFactory(Factory):
     title = Faker('text')
     description = Faker('text')
     state = factory.fuzzy.FuzzyChoice(TodoState)
+    user_id = 1
     user_id = 1
 
 
@@ -100,7 +103,9 @@ async def test_list_todos_filter_description_should_return_5_todos(
         TodoFactory.create_batch(5, user_id=user.id, description='description')
     )
 
-    session.add_all(TodoFactory.create_batch(5, user_id=user.id))
+    session.add_all(
+        TodoFactory.create_batch(5, user_id=user.id, description='not')
+    )
 
     await session.commit()
 
@@ -121,7 +126,9 @@ async def test_list_todos_state_should_return_5_todos(
         TodoFactory.create_batch(5, user_id=user.id, state=TodoState.draft)
     )
 
-    session.add_all(TodoFactory.create_batch(5, user_id=user.id))
+    session.add_all(
+        TodoFactory.create_batch(5, user_id=user.id, state=TodoState.trash)
+    )
 
     await session.commit()
 
@@ -234,10 +241,10 @@ async def test_list_todos_should_return_all_expected_fields(
 
 
 @pytest.mark.asyncio
-async def test_create_todo_error(session, user):
+async def test_create_todo_error(session, user: User):
     todo = Todo(
-        title='Test todo',
-        description='Description',
+        title='Test Todo',
+        description='Test Desc',
         state='test',
         user_id=user.id,
     )
