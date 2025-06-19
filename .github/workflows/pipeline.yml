@@ -7,7 +7,7 @@ jobs:
     steps:
       - name: Copia os arquivos do repositório
         uses: actions/checkout@v4
-        
+
       - name: Instalar o Python
         uses: actions/setup-python@v5
         with:
@@ -21,3 +21,9 @@ jobs:
 
       - name: Executar testes
         run: poetry run task test
+
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      ALGORITHM: ${{ secrets.ALGORITHM }}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}
