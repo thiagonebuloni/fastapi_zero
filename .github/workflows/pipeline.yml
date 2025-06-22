@@ -23,7 +23,7 @@ jobs:
         run: poetry run task lint
 
       - name: Executar testes
-        run: poetry run task test-prod
+        run: poetry run task test_prod
 
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
