@@ -58,6 +58,7 @@ format = 'ruff format'
 run = 'fastapi dev fastapi_zero/app.py'
 pre_test = 'task lint'
 test = 'pytest -cov=fastapi_zero -vvsx'
+test_prod = 'pytest -vvsx'
 post_test = 'coverage html'
 
 [tool.coverage.run]
