@@ -85,7 +85,7 @@ async def test_list_todos_filter_title_should_return_5_todos(
 
     session.add_all(TodoFactory.create_batch(5, user_id=user.id))
 
-    session.commit()
+    await session.commit()
 
     response = client.get(
         '/todos/?title=Test todo 1',
